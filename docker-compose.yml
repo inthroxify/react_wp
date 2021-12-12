@@ -1,0 +1,51 @@
+# based off of https://github.com/bitnami/bitnami-docker-wordpress
+version: '2'
+services:
+    mariadb:
+        image: docker.io/bitnami/mariadb:10.3
+        volumes:
+            - ./backend/db/data:/bitnami/mariadb
+        environment:
+            # ALLOW_EMPTY_PASSWORD is recommended only for development.
+            - ALLOW_EMPTY_PASSWORD=yes
+            - MARIADB_USER=bn_wordpress
+            - MARIADB_DATABASE=bitnami_wordpress
+        networks:
+            - wp-db
+    wordpress:
+        image: docker.io/bitnami/wordpress-nginx:5
+        ports:
+            - '84:8080'
+            #- '443:8443'
+        volumes:
+            - ./backend/www/data:/bitnami/wordpress
+            - ./backend/www/conf/wordpress-server-block.conf:/opt/bitnami/nginx/conf/server_blocks/wordpress-server-block.conf:ro
+            - ./frontend/build:/opt/bitnami/wordpress/build
+        depends_on:
+            - mariadb
+        environment:
+            # ALLOW_EMPTY_PASSWORD is recommended only for development.
+            - ALLOW_EMPTY_PASSWORD=yes
+            - WORDPRESS_DATABASE_HOST=mariadb
+            - WORDPRESS_DATABASE_PORT_NUMBER=3306
+            - WORDPRESS_DATABASE_USER=bn_wordpress
+            - WORDPRESS_DATABASE_NAME=bitnami_wordpress
+        networks:
+            - wp-node
+            - wp-db
+    node:
+        tty: true # Enables debugging capabilities when attached to this container.
+        image: docker.io/bitnami/node:16
+        # command: sh -c 'npm install && npm start'
+        ports:
+            - '3004:3000'
+        volumes:
+            - ./frontend:/app
+        command: ["npm", "start"]
+        networks:
+            - wp-node
+networks:
+    wp-node:
+        driver: bridge
+    wp-db:
+        driver: bridge
