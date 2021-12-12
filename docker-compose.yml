@@ -4,7 +4,7 @@ services:
     mariadb:
         image: docker.io/bitnami/mariadb:10.3
         volumes:
-            - ./backend/db/data:/bitnami/mariadb
+            - ./backend/db/data:/bitnami/mariadb:z
         environment:
             # ALLOW_EMPTY_PASSWORD is recommended only for development.
             - ALLOW_EMPTY_PASSWORD=yes
@@ -18,7 +18,7 @@ services:
             - '84:8080'
             #- '443:8443'
         volumes:
-            - ./backend/www/data:/bitnami/wordpress
+            - ./backend/www/data:/bitnami/wordpress:z
             - ./backend/www/conf/wordpress-server-block.conf:/opt/bitnami/nginx/conf/server_blocks/wordpress-server-block.conf:ro
             - ./frontend/build:/opt/bitnami/wordpress/build
         depends_on:
@@ -40,8 +40,8 @@ services:
         ports:
             - '3004:3000'
         volumes:
-            - ./frontend:/app
-        command: ["npm", "start"]
+            - ./frontend:/app:z
+        command: ['/bin/bash', '-c', 'if [ ! -d "node_modules" ]; then yarn install; mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache; fi; npm run start']
         networks:
             - wp-node
 networks:

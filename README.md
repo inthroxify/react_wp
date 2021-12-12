@@ -9,8 +9,15 @@
 ```bash
 git clone https://github.com/inthroxify/react_wp.git
 cd react_wp
+chmod -R 777 backend
+docker-compose up -d
+## or 
 docker compose up -d
+## optional for development, depending on platform security:
+#chmod -R 777 frontend; docker-compose restart node
 ```
+
+The chmod of `backend` is necessary depending on your platform, and guarantees the database can write to its data files.
 
 ### In your browser:
 For the React app: 
@@ -23,13 +30,16 @@ For the WordPress/admin:
 
 ## Features
 * React routing V6. _Not your grandma's router._
+  * React code is in `frontend/src`.
 * Blog banner image settable via WordPress admin interface.
   * To set the banner of the blog via the WordPress admin interface, simply set the featured image of the Homepage. For your convenience, the Homepage is currently set to the "Home Page" page.
 * A tiny plugin was written to extend the WordPress REST API, adding an endpoint to quickly retrieve the blog banner image.
+  * Have a look at `backend/www/data/wp-content/plugins/rest-api-homepage-image-url`.
 * For development, node is reverse-proxied, so urls are nicer to deal with.
   * If a production build in `frontend/build` is present, it will serve that first. Delete/rename `frontend/build/index.html` to fall through to the development node server.
 
 ## Things to Know
+* Everything is included, including the database storage files. The idea is that you should be able to run it out-of-the-box and see what I see.
 * In developing this I tried to keep in mind Agile Manifesto Principal 10 -- maximize work _not_ done -- so, work that was not asked for isn't included if it wasn't described, unless it was reasonable to do in a short time. As such:
   * Existing WordPress GUIs were used creatively to offer configuration functionality.
   * A tiny, simple, and quick WordPress plugin was written to extend the WordPress REST API.
